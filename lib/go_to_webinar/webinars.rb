@@ -23,5 +23,11 @@ module GoToWebinar
     def create_webinar(params = {})
       self.class.post("webinars", :body => params.to_json)
     end
+
+    # TODO: Add tests
+    def update_webinar(webinar_key, params = {})
+      # TODO: Add support for 'notifyParticipants' (https://developer.citrixonline.com/content/gotowebinar-api-reference#!/Webinars/updateWebinar)
+      self.class.put("webinars/#{webinar_key}", :body => params.to_json)
+    end
   end
 end
