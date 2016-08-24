@@ -49,9 +49,17 @@ class WebinarsTest < Test::Unit::TestCase
       assert_not_nil @r.parsed_response.first["webinarKey"]
     end
 
-    should "create a webinar with valid params" do
-      FakeWeb.register_uri(:post, "https://api.citrixonline.com/G2W/rest/organizers/54321/webinars",:body => '{"webinarKey":"54321"}', :content_type => "application/json", :status => ["200", "OK"])
+    should 'generate valid webinar creation' do
+      FakeWeb.register_uri(:post, "https://api.citrixonline.com/G2W/rest/organizers/54321/webinars",:body => '{"webinarKey":"77777"}', :content_type => "application/json", :status => ["200", "OK"])
       @r = @c.create_webinar(creation_params)
+      assert_not_nil @r
+      assert @r.parsed_response.is_a?(Hash)
+      assert_not_nil @r.parsed_response["webinarKey"]
+    end
+
+    should 'generate valid updated webinar' do
+      FakeWeb.register_uri(:put, "https://api.citrixonline.com/G2W/rest/organizers/54321/webinars/77777",:body => '{"webinarKey":"77777"}', :content_type => "application/json", :status => ["200", "OK"])
+      @r = @c.update_webinar('77777', update_params)
       assert_not_nil @r
       assert @r.parsed_response.is_a?(Hash)
       assert_not_nil @r.parsed_response["webinarKey"]
@@ -60,13 +68,22 @@ class WebinarsTest < Test::Unit::TestCase
 
   def creation_params
     {
-      "subject":              "string",
-      "description":          "string",
-      "timeZone":             "America/New_York",
-      "type":                 "single_session",
-      "isPasswordProtected":  false,
-      "times":                [{  "startTime":  (Time.now + 3600).iso8601,
-                                  "endTime":    (Time.now + 7200).iso8601   }]
+      :subject              => 'string',
+      :description          => 'string',
+      :timeZone             => 'America/New_York',
+      :type                 => 'single_session',
+      :isPasswordProtected  => false,
+      :times                => [{ :startTime  => (Time.now + 3600).iso8601,
+                                  :endTime    => (Time.now + 7200).iso8601 }]
+    }
+  end
+
+  def update_params
+    {
+      :subject      => 'updated_string',
+      :description  => 'updated_string',
+      :times        => [{ :startTime  => (Time.now + 7200).iso8601,
+                          :endTime    => (Time.now + 10_800).iso8601 }]
     }
   end
 end
